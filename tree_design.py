@@ -122,7 +122,7 @@ class TreeBuilderState(ABC):
         pass
 
     def __repr__(self):
-        return f"<{self.__class__.__name__} for {self.builder.name}>"
+        return f"<{self.__class__.__name__} para {self.builder.name}>"
 
 class SplittingState(TreeBuilderState):
     def handle(self):
