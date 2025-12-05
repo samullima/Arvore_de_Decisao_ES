@@ -43,6 +43,7 @@ class LeafNode(Node):
     def accept(self, visitor):
         return visitor.visit_leaf(self)
     
+    
 # Estrutura do Iterator
 class PreOrderIterator:
     """Iterador pré-ordem (raiz, depois filhos da esquerda para a direita)."""   
@@ -64,6 +65,7 @@ class PreOrderIterator:
             for child in reversed(node.children):
                 self.stack.append(child)
         return node
+    
     
 # Estrutura do Visitor 
 class Visitor(ABC):
@@ -95,7 +97,7 @@ class DepthVisitor(Visitor):
         return mocked_depth
 
 class CountLeavesVisitor(Visitor):
-    """Mockado: conta folhas via iteração porém também faz prints representativos."""
+    """Mockado: conta folhas via iteração e também faz prints representativos."""
     def __init__(self):
         self.count = 0
 
@@ -108,3 +110,76 @@ class CountLeavesVisitor(Visitor):
         self.count += 1
         print(f"[Visitor:CountLeaves] Encontrada folha {leaf_node.name}. Total (mock): {self.count}")
         return self.count
+    
+    
+# Estrutura do State (TreeBuilder)
+class TreeBuilderState(ABC):
+    def __init__(self, builder):
+        self.builder = builder
+
+    @abstractmethod
+    def handle(self):
+        pass
+
+    def __repr__(self):
+        return f"<{self.__class__.__name__} for {self.builder.name}>"
+
+class SplittingState(TreeBuilderState):
+    def handle(self):
+        print(f"[State] {self.builder.name}: entrando em SplittingState (mock)." )
+        # mock: cria dois nós filhos sob o alvo atual
+        target = self.builder.current_target or self.builder.root
+        left = DecisionNode(f"split_left_of_{target.name}")
+        right = LeafNode(f"split_right_of_{target.name}")
+        target.add(left)
+        target.add(right)
+        print(f"[State] {self.builder.name}: divisão mock realizada em {target}.")
+
+class StoppingState(TreeBuilderState):
+    def handle(self):
+        print(f"[State] {self.builder.name}: entrando em StoppingState (mock)." )
+        target = self.builder.current_target or self.builder.root
+        leaf = LeafNode(f"stopped_leaf_of_{target.name}")
+        target.add(leaf)
+        print(f"[State] {self.builder.name}: parada mock realizada em {target}.")
+
+class PruningState(TreeBuilderState):
+    def handle(self):
+        print(f"[State] {self.builder.name}: entrando em PruningState (mock)." )
+        target = self.builder.current_target or self.builder.root
+        # mock: remove o último filho se existir
+        if isinstance(target, CompositeNode) and target.children:
+            removed = target.children[-1]
+            target.remove(removed)
+            print(f"[State] {self.builder.name}: poda mock removeu {removed} de {target}.")
+        else:
+            print(f"[State] {self.builder.name}: nada a podar em {target}.")
+
+class TreeBuilder:
+    def __init__(self, name, root=None):
+        self.name = name
+        self.root = root or DecisionNode("root")
+        self.current_target = self.root
+        # instanciando estados
+        self.splitting = SplittingState(self)
+        self.stopping = StoppingState(self)
+        self.pruning = PruningState(self)
+        self.state = self.splitting
+        print(f"[TreeBuilder] Criado TreeBuilder '{self.name}' com root {self.root}")
+
+    def set_target(self, node):
+        self.current_target = node
+        print(f"[TreeBuilder] Target atual definido para {node}")
+
+    def set_state(self, state_name):
+        mapping = {
+            'splitting': self.splitting,
+            'stopping': self.stopping,
+            'pruning': self.pruning
+        }
+        self.state = mapping.get(state_name, self.state)
+        print(f"[TreeBuilder] Estado alterado para {self.state}")
+
+    def handle(self):
+        print(f"[TreeBuilder] {self.name}: handle() chamado no estado {self.state}")
+        self.state.handle()
