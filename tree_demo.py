@@ -58,6 +58,6 @@ def main():
     demo_iterator_and_visitors(root)
     print("\n====== Demo finalizado ======\n")
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()
  
