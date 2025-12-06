@@ -2,15 +2,6 @@
 - **Autor:** Samuel Corrêa Lima
 - **Disciplina:** Engenharia de Software
 
-Este projeto implementa uma árvore de decisão mockada utilizando quatro padrões clássicos de projeto:
-
-- Composite (estrutura hierárquica da árvore)
-- Iterator (percorrer os nós em pré-ordem)
-- Visitor (operações desacopladas dos nós)
-- State (máquina de estados do TreeBuilder)
-
-Todo o sistema foi implementado em Python, com foco em clareza, modularidade e demonstração prática dos padrões.
-
 ## Padrões de Projeto Utilizados
 Este projeto faz uso de quatro padrões de projeto clássicos da Engenharia de Software:
 
